@@ -29,11 +29,6 @@ func TgSender(
 }
 
 func (s *Sender) Send(message string) error {
-	//bot, err := tgbotapi.NewBotAPI(s.token)
-	//if err != nil {
-	//	return fmt.Errorf("error creating new tg bot: %w", err)
-	//}
-
 	msg := tgbotapi.NewMessage(int64(s.chatId), message)
 	msg.ParseMode = "Markdown"
 

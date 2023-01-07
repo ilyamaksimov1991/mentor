@@ -102,5 +102,3 @@ func (g *Goodmorning) money2() (string, error) {
 
 	return fmt.Sprintf("*Курс валют:* \n%s%s", res, crypto), nil
 }
-
-//https://t.me/+SAp7bGMh_lVjMjky

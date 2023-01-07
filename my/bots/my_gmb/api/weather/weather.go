@@ -9,8 +9,6 @@ import (
 	"strings"
 )
 
-//https://api.openweathermap.org/data/2.5/weather?lat=55.751244&lon=37.618423&appid=6b12d713c6675eeb686d1e76c3012dd3&lang=ru&type=like&units=metric&id=524901
-//http://api.coinlayer.com/api/live?access_key=2faaf66bafb4c2f38605a2219cd7b9d8&target=USD&symbols=BTC,ETH
 const (
 	weatherEndpoint = "https://api.openweathermap.org/data/2.5/weather/"
 )

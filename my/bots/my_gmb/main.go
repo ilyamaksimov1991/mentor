@@ -19,12 +19,10 @@ import (
 	"syscall"
 )
 
-//https://api.openweathermap.org/data/3.0/onecall?lat=55.751244&lon=37.618423&exclude={part}&appid=ba1fb93d3ac2ffc61f4cada5c0e7d5c
-//https://api.openweathermap.org/data/3.0/onecall?lat=55.751244&lon=37.618423&appid=ba1fb93d3ac2ffc61f4cada5c0e7d5c
-//https://api.openweathermap.org/data/2.5/weather?lat=55.751244&lon=37.618423&appid=6b12d713c6675eeb686d1e76c3012dd3&lang=ru&type=like&units=metric&id=524901
 const (
 	token  = "5788134511:AAES_-z7AAaQc22huJjXLdJepLjjSKWtR5M"
-	chatId = -762680933
+	chatId = 335693490
+	//chatId = -762680933
 )
 
 func main() {
@@ -119,36 +117,4 @@ func initLogger(logLevel string, isLogJson bool) (*zap.Logger, error) {
 	}
 
 	return opts.Build()
-}
-
-func main1() {
-	//fmt.Print(weather.Weather())
-	//os.Exit(1)
-	//bot, err := tgbotapi.NewBotAPI(token)
-	//if err != nil {
-	//	fmt.Println(err)
-	//	panic(err)
-	//}
-	//
-	//bot.Debug = true
-	//
-	//photo := tgbotapi.NewVideo(chatId, tgbotapi.FileURL(fmt.Sprintf("https://cataas.com/cat/gif?%v", time.Now())))
-	//if _, err = bot.Send(photo); err != nil {
-	//	log.Fatalln(err)
-	//	panic(err)
-	//}
-	//
-	//t := quote.NewQuoter()
-	//f := fact.NewFact()
-	//
-	//msg1 := fmt.Sprint(t, f, weather.Weather())
-	//msg := tgbotapi.NewMessage(chatId, msg1)
-	//msg.ParseMode = "Markdown"
-	//
-	//_, err = bot.Send(msg)
-	//if err != nil {
-	//	fmt.Println(err)
-	//	panic(err)
-	//}
-	//fmt.Print(money.Money())
 }
