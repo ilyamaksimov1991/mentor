@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  good_morning_bot:
+    container_name: good_morning_bot
+  # сбилдить текущий локальный проект
+  # УДАЛИТЬ текущий образ "docker rmi dev_productfilter-worker-1" нужно при повторном перезапуке
+    build:
+      context: ./
+#    environment:
+#      - CL_LOG_LEVEL=info
+#      - CL_LOG_JSON=false
+#      - CL_GOODMORNING_BOT_SCHEDULE= */1 * * * *
+    env_file:
+      - .env
+    volumes:
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
