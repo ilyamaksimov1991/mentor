@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"log"
 	"my/bots/my_gmb/api/fact"
+	"my/bots/my_gmb/api/horoscope"
 	"my/bots/my_gmb/api/money"
 	"my/bots/my_gmb/api/quote"
 	"my/bots/my_gmb/api/weather"
@@ -17,11 +18,13 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 const (
 	token  = "5788134511:AAES_-z7AAaQc22huJjXLdJepLjjSKWtR5M"
 	chatId = 335693490
+	//chatId = 594802719
 	//chatId = -762680933
 )
 
@@ -54,6 +57,7 @@ func main() {
 		money.NewMoney(),
 		money.NewCrypto(),
 		weather.NewWeather(),
+		api.NewHoroscope(),
 	)
 
 	_, err = scheduler.AddFunc(cfg.GoodmorningBotSchedule, func() {
@@ -66,6 +70,7 @@ func main() {
 			if err != nil {
 				retry++
 				logger.Error("error getting view", zap.Error(err))
+				time.Sleep(time.Second * 2)
 			} else {
 				break
 			}

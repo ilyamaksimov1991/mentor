@@ -10,11 +10,12 @@ type Api interface {
 }
 
 type Goodmorning struct {
-	quote   Api
-	fact    Api
-	money   Api
-	crypto  Api
-	weather Api
+	quote     Api
+	fact      Api
+	money     Api
+	crypto    Api
+	weather   Api
+	horoscope Api
 }
 
 func ViewGoodmorning(
@@ -23,13 +24,15 @@ func ViewGoodmorning(
 	money Api,
 	crypto Api,
 	weather Api,
+	horoscope Api,
 ) *Goodmorning {
 	return &Goodmorning{
-		quote:   quote,
-		fact:    fact,
-		money:   money,
-		crypto:  crypto,
-		weather: weather,
+		quote:     quote,
+		fact:      fact,
+		money:     money,
+		crypto:    crypto,
+		weather:   weather,
+		horoscope: horoscope,
 	}
 }
 
@@ -47,6 +50,12 @@ func (g *Goodmorning) View() (string, error) {
 	}
 	result = append(result, quote)
 
+	horoscope, err := g.horoscope2()
+	if err != nil {
+		return "", fmt.Errorf("horoscope getting error: %w", err)
+	}
+	result = append(result, horoscope)
+
 	weather, err := g.weatherOfCities()
 	if err != nil {
 		return "", fmt.Errorf("weather getting error: %w", err)
@@ -58,6 +67,7 @@ func (g *Goodmorning) View() (string, error) {
 		return "", fmt.Errorf("money getting error: %w", err)
 	}
 	result = append(result, money)
+
 	result = append(result, "Ваш доброе-утро бот ❤️")
 
 	return strings.Join(result, "\n"), nil
@@ -101,4 +111,12 @@ func (g *Goodmorning) money2() (string, error) {
 	}
 
 	return fmt.Sprintf("*Курс валют:* \n%s%s", res, crypto), nil
+}
+func (g *Goodmorning) horoscope2() (string, error) {
+	res, err := g.horoscope.Get()
+	if err != nil {
+		return "", fmt.Errorf("horoscope getting error: %w", err)
+	}
+
+	return fmt.Sprintf("*Гороскоп:* \n%s", res), nil
 }
