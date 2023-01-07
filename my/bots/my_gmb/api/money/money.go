@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"golang.org/x/net/html/charset"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 const (
@@ -76,7 +78,12 @@ func (m *Money) Get() (string, error) {
 	str := ""
 	for _, val := range curs.Valute {
 		if _, ok := money[val.ID]; ok {
-			str += fmt.Sprintf(" %v %v\n", val.CharCode, val.Value)
+			// замена запятой на точку
+			cost, err := strconv.ParseFloat(strings.Replace(val.Value, ",", ".", -1), 64)
+			if err != nil {
+				return "", fmt.Errorf("price conversion error: %w", err)
+			}
+			str += fmt.Sprintf(" %v %.2f\n", val.CharCode, cost)
 		}
 	}
 
