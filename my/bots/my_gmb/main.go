@@ -45,31 +45,46 @@ func main() {
 	scheduler := cron.New()
 	defer scheduler.Stop()
 
+	s, err := sender.TgSender(token, chatId)
+	if err != nil {
+		logger.Fatal("tg sender creation error", zap.Error(err))
+	}
+
+	viewer := view.ViewGoodmorning(
+		quote.NewQuoter(),
+		fact.NewFact(),
+		money.NewMoney(),
+		money.NewCrypto(),
+		weather.NewWeather(),
+	)
+
 	_, err = scheduler.AddFunc(cfg.GoodmorningBotSchedule, func() {
 		logger.Info("start")
-		viewer := view.ViewGoodmorning(
-			quote.NewQuoter(),
-			fact.NewFact(),
-			money.NewMoney(),
-			weather.NewWeather(),
-		)
 
-		template, err := viewer.View()
-		if err != nil {
-			logger.Fatal("error getting view", zap.Error(err))
+		template := ""
+		retry := 0
+		for retry <= cfg.Retry {
+			template, err = viewer.View()
+			if err != nil {
+				retry++
+				logger.Error("error getting view", zap.Error(err))
+			} else {
+				break
+			}
 		}
 
-		s, err := sender.TgSender(token, chatId)
-		if err != nil {
-			logger.Fatal("tg sender creation error", zap.Error(err))
+		if template == "" {
+			logger.Error("template empty", zap.Error(err))
+			return
 		}
+
 		err = s.SendVideo()
 		if err != nil {
-			logger.Fatal("template sending video error", zap.Error(err))
+			logger.Error("template sending video error", zap.Error(err))
 		}
 		err = s.Send(template)
 		if err != nil {
-			logger.Fatal("template sending error", zap.Error(err))
+			logger.Error("template sending error", zap.Error(err))
 		}
 	})
 	if err != nil {
