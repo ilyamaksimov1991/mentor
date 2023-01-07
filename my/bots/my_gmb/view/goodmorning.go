@@ -13,6 +13,7 @@ type Goodmorning struct {
 	quote   Api
 	fact    Api
 	money   Api
+	crypto  Api
 	weather Api
 }
 
@@ -20,12 +21,14 @@ func ViewGoodmorning(
 	quote Api,
 	fact Api,
 	money Api,
+	crypto Api,
 	weather Api,
 ) *Goodmorning {
 	return &Goodmorning{
 		quote:   quote,
 		fact:    fact,
 		money:   money,
+		crypto:  crypto,
 		weather: weather,
 	}
 }
@@ -92,8 +95,12 @@ func (g *Goodmorning) money2() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("curs getting error: %w", err)
 	}
+	crypto, err := g.crypto.Get()
+	if err != nil {
+		return "", fmt.Errorf("curs getting error: %w", err)
+	}
 
-	return fmt.Sprintf("*Курс валют:* \n%s", res), nil
+	return fmt.Sprintf("*Курс валют:* \n%s%s", res, crypto), nil
 }
 
 //https://t.me/+SAp7bGMh_lVjMjky
