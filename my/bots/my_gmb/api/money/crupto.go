@@ -50,6 +50,7 @@ func (m *Crypto) Get() (string, error) {
 	return fmt.Sprintf(" BTC %.2f \n ETH %.2f \n", curs.Rates.Btc, curs.Rates.Eth), nil
 }
 
+// для сум к доллару
 //curl --request GET 'https://api.apilayer.com/currency_data/live?source=USD&currencies=uzs,rub' \
 //--header 'apikey: VWFCzZbdboGDomwzCPKvs7gtM9Q3r0dU'
 //
