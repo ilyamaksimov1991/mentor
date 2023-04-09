@@ -14,4 +14,8 @@ WORKDIR /build
 
 COPY --from=builder /build/gmb /build/gmb
 
+COPY 2023.json /build
+COPY family.json /build
+COPY advice.txt /build
+
 CMD ["./gmb"]

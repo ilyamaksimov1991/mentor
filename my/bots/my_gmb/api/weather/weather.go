@@ -13,20 +13,22 @@ const (
 	weatherEndpoint = "https://api.openweathermap.org/data/2.5/weather/"
 )
 
-type city string
+type city int
 type coord struct {
 	lon float64
 	lat float64
 }
 
 const (
-	ufa     city = "ufa"
-	dmitrov city = "dmitrov"
+	ufa      city = 1
+	dmitrov  city = 2
+	tashkent city = 3
 )
 
 var cityToCoordsMap = map[city]coord{
-	ufa:     {lon: 56.126128, lat: 54.815160},
-	dmitrov: {lon: 37.531541, lat: 56.375150},
+	ufa:      {lat: 54.809469, lon: 56.113848}, // долгота longitude
+	dmitrov:  {lat: 56.375150, lon: 37.531541}, // широта latitude
+	tashkent: {lat: 41.264650, lon: 69.216270},
 }
 
 type WeatherResponse struct {

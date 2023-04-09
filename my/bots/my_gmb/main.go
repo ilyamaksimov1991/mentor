@@ -7,7 +7,9 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"log"
+	"my/bots/my_gmb/api/advice"
 	"my/bots/my_gmb/api/fact"
+	"my/bots/my_gmb/api/holiday"
 	"my/bots/my_gmb/api/horoscope"
 	"my/bots/my_gmb/api/money"
 	"my/bots/my_gmb/api/quote"
@@ -46,12 +48,14 @@ func main() {
 	scheduler := cron.New()
 	defer scheduler.Stop()
 
-	s, err := sender.TgSender(token, chatId)
+	s, err := sender.TgSender(token, cfg.ChatId)
 	if err != nil {
 		logger.Fatal("tg sender creation error", zap.Error(err))
 	}
 
 	viewer := view.ViewGoodmorning(
+		holiday.NewHolidaysToday(),
+		advice.NewAdvice(),
 		quote.NewQuoter(),
 		fact.NewFact(),
 		money.NewMoney(),
@@ -70,7 +74,7 @@ func main() {
 			if err != nil {
 				retry++
 				logger.Error("error getting view", zap.Error(err))
-				time.Sleep(time.Second * 2)
+				time.Sleep(time.Second * 20)
 			} else {
 				break
 			}

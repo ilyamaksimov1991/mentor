@@ -136,18 +136,18 @@ func (h Horoscope) Get() (string, error) {
 	}
 
 	hr := []string{}
-	//hr = append(hr, fmt.Sprintf("Овен: %s", horo.Aries.Yesterday))
-	//hr = append(hr, fmt.Sprintf("Телец: %s", horo.Taurus.Yesterday))
-	hr = append(hr, fmt.Sprintf("  ♑️_Козерог_:  %s\n", strings.Trim(horo.Capricorn.Yesterday, "\n")))
-	hr = append(hr, fmt.Sprintf("  ♒️_Водолей_:  %s\n", strings.Trim(horo.Aquarius.Yesterday, "\n")))
-	hr = append(hr, fmt.Sprintf("  ♏️_Скорпион_:  %s\n", strings.Trim(horo.Scorpio.Yesterday, "\n")))
-	hr = append(hr, fmt.Sprintf("  ♊️_Близнецы_:  %s\n", strings.Trim(horo.Gemini.Yesterday, "\n")))
-	hr = append(hr, fmt.Sprintf("  ♋️_Рак_:  %s", strings.Trim(horo.Cancer.Yesterday, "\n")))
-	//hr = append(hr, fmt.Sprintf("Лев: %s", horo.Leo.Yesterday))
-	//hr = append(hr, fmt.Sprintf("Дева: %s", horo.Virgo.Yesterday))
-	//hr = append(hr, fmt.Sprintf(" `_Весы_`: %s\n", strings.Trim(horo.Libra.Yesterday, "\n")))
-	//	hr = append(hr, fmt.Sprintf("Стрелец: %s", horo.Sagittarius.Yesterday))
-	//hr = append(hr, fmt.Sprintf("Рыбы: %s", horo.Pisces.Yesterday))
+	hr = append(hr, fmt.Sprintf("  ♑️_Козерог_:  %s\n", strings.Trim(horo.Capricorn.Today, "\n")))
+	hr = append(hr, fmt.Sprintf("  ♒️_Водолей_:  %s\n", strings.Trim(horo.Aquarius.Today, "\n")))
+	hr = append(hr, fmt.Sprintf("  ♏️_Скорпион_:  %s\n", strings.Trim(horo.Scorpio.Today, "\n")))
+	hr = append(hr, fmt.Sprintf("  ♊️_Близнецы_:  %s\n", strings.Trim(horo.Gemini.Today, "\n")))
+	hr = append(hr, fmt.Sprintf("  ♋️_Рак_:  %s\n", strings.Trim(horo.Cancer.Today, "\n")))
+	hr = append(hr, fmt.Sprintf("  ♉️_Овен_: %s\n", strings.Trim(horo.Aries.Today, "\n")))
+	hr = append(hr, fmt.Sprintf("  ♉️_Телец_: %s\n", strings.Trim(horo.Taurus.Today, "\n")))
+	hr = append(hr, fmt.Sprintf("  ♌️_Лев_: %s\n", strings.Trim(horo.Leo.Today, "\n")))
+	hr = append(hr, fmt.Sprintf("  ♍️_Дева_: %s\n", strings.Trim(horo.Virgo.Today, "\n")))
+	hr = append(hr, fmt.Sprintf("  ♎️_Весы_: %s\n", strings.Trim(horo.Libra.Today, "\n")))
+	hr = append(hr, fmt.Sprintf("  ♐️_Стрелец_: %s\n", strings.Trim(horo.Sagittarius.Today, "\n")))
+	hr = append(hr, fmt.Sprintf("  ♐️_Рыбы_: %s", strings.Trim(horo.Pisces.Today, "\n")))
 
 	return strings.Join(hr, ""), nil
 }
