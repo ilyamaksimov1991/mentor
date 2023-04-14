@@ -15,6 +15,7 @@ type Goodmorning struct {
 	quote     Api
 	fact      Api
 	money     Api
+	currency  Api
 	crypto    Api
 	weather   Api
 	horoscope Api
@@ -26,6 +27,7 @@ func ViewGoodmorning(
 	quote Api,
 	fact Api,
 	money Api,
+	currency Api,
 	crypto Api,
 	weather Api,
 	horoscope Api,
@@ -36,6 +38,7 @@ func ViewGoodmorning(
 		quote:     quote,
 		fact:      fact,
 		money:     money,
+		currency:  currency,
 		crypto:    crypto,
 		weather:   weather,
 		horoscope: horoscope,
@@ -120,21 +123,36 @@ func (g *Goodmorning) weatherOfCities() (string, error) {
 }
 
 func (g *Goodmorning) money2() (string, error) {
+	mon, err := g.money.Get()
+	if err != nil {
+		fmt.Printf("curs getting error: %w", err)
+		//return fmt.Sprintf("*Курс валют:* \n%s", crypto), nil
+	}
+
+	res := make([]string, 0, 3)
+	currency, err := g.currency.Get()
+	if err != nil {
+		if mon != "" {
+			res = append(res, mon)
+		}
+		fmt.Printf("currency getting error: %w", err)
+		//return "", fmt.Errorf("currency getting error: %w", err)
+	}
+
+	if currency != "" {
+		res = append(res, currency)
+	}
 
 	crypto, err := g.crypto.Get()
 	if err != nil {
 		return "", fmt.Errorf("curs getting error: %w", err)
 	}
 
-	res, err := g.money.Get()
-	if err != nil {
-		//return "", fmt.Errorf("curs getting error: %w", err)
-		fmt.Printf("curs getting error: %w", err)
-		return fmt.Sprintf("*Курс валют:* \n%s", crypto), nil
-	}
+	res = append(res, crypto)
 
-	return fmt.Sprintf("*Курс валют:* \n%s%s", res, crypto), nil
+	return fmt.Sprintf("*Курс валют:* \n%s", res), nil
 }
+
 func (g *Goodmorning) horoscope2() (string, error) {
 	res, err := g.horoscope.Get()
 	if err != nil {

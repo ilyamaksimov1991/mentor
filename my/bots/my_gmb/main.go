@@ -59,6 +59,7 @@ func main() {
 		quote.NewQuoter(),
 		fact.NewFact(),
 		money.NewMoney(),
+		money.NewCurrency(),
 		money.NewCrypto(),
 		weather.NewWeather(),
 		api.NewHoroscope(),
