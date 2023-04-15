@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	moneyEndpoint = "http://www.cbr.ru/scripts/XML_daily.asp"
+	cbrEndpoint = "http://www.cbr.ru/scripts/XML_daily.asp"
 )
 
 var moneyCurrency = map[string]bool{"R01235": true, "R01239": true, "R01717": true}
@@ -30,7 +30,7 @@ var moneyCurrency = map[string]bool{"R01235": true, "R01239": true, "R01717": tr
 //	} `xml:"ValCurs"`
 //}
 
-type ValCurs struct {
+type ValCurrency struct {
 	XMLName xml.Name `xml:"ValCurs"`
 	Text    string   `xml:",chardata"`
 	Date    string   `xml:"Date,attr"`
@@ -54,7 +54,7 @@ func NewCbr() *Cbr {
 }
 
 func (m *Cbr) Get() (string, error) {
-	req, err := http.NewRequest("GET", moneyEndpoint, nil)
+	req, err := http.NewRequest("GET", cbrEndpoint, nil)
 	if err != nil {
 		return "", fmt.Errorf("failed to create moneyCurrency request: %w", err)
 	}
@@ -67,7 +67,7 @@ func (m *Cbr) Get() (string, error) {
 		return "", fmt.Errorf("failed to complete the moneyCurrency request: %w", err)
 	}
 	defer resp.Body.Close()
-	curs := &ValCurs{}
+	curs := &ValCurrency{}
 	derr := xml.NewDecoder(resp.Body)
 	derr.CharsetReader = charset.NewReaderLabel
 	err = derr.Decode(curs)
