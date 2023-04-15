@@ -75,6 +75,17 @@ func (v *CurrencyView) TestError() {
 		v.Equal(expected, res)
 	})
 
+	v.Run("error from api cbr", func() {
+		expected := "*Курс валют:* \ncurrency\ncrypto"
+		v.cbr.EXPECT().Get().Return("cbr", errors.New("error")).Times(1)
+		v.currency.EXPECT().Get().Return("currency", nil)
+		v.crypto.EXPECT().Get().Return("crypto", nil)
+
+		res, err := v.view.View()
+		v.Nil(err)
+		v.Equal(expected, res)
+	})
+
 	v.Run("error from all APIs", func() {
 		v.cbr.EXPECT().Get().Return("", errors.New("error")).Times(v.maxCountRetries)
 		v.currency.EXPECT().Get().Return("", errors.New("error")).Times(v.maxCountRetries)
