@@ -53,16 +53,29 @@ func main() {
 		logger.Fatal("tg sender creation error", zap.Error(err))
 	}
 
+	//viewer := view.ViewGoodmorning(
+	//	holiday.NewHolidaysToday(),
+	//	advice.NewAdvice(),
+	//	quote.NewQuoter(),
+	//	fact.NewFact(),
+	//	money.NewCbr(),
+	//	money.NewCurrency(),
+	//	money.NewCrypto(),
+	//	weather.NewWeather(),
+	//	api.NewHoroscope(),
+	//	cfg.Retry,
+	//	logger,
+	//)
 	viewer := view.ViewGoodmorning(
 		holiday.NewHolidaysToday(),
 		advice.NewAdvice(),
 		quote.NewQuoter(),
 		fact.NewFact(),
-		money.NewMoney(),
-		money.NewCurrency(),
-		money.NewCrypto(),
+		view.NewCurrency(money.NewCbr(), money.NewCurrency(), money.NewCrypto(), cfg.Retry, time.Second*20, logger),
 		weather.NewWeather(),
 		api.NewHoroscope(),
+		cfg.Retry,
+		logger,
 	)
 
 	_, err = scheduler.AddFunc(cfg.GoodmorningBotSchedule, func() {

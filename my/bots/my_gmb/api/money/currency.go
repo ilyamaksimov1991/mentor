@@ -45,6 +45,6 @@ func (m *Currency) Get() (string, error) {
 		return "", fmt.Errorf("crypto decoding error: %w", err)
 	}
 
-	return fmt.Sprintf(" USD %.2f \n EUR %.2f \n UZS %.2f \n",
+	return fmt.Sprintf(" USD %.2f \n EUR %.2f \n UZS %.2f",
 		curs.Quotes.Usdrub, curs.Quotes.Usdrub/curs.Quotes.Usdeur, curs.Quotes.Usduzs), nil
 }

@@ -46,14 +46,14 @@ type ValCurs struct {
 	} `xml:"Valute"`
 }
 
-type Money struct {
+type Cbr struct {
 }
 
-func NewMoney() *Money {
-	return &Money{}
+func NewCbr() *Cbr {
+	return &Cbr{}
 }
 
-func (m *Money) Get() (string, error) {
+func (m *Cbr) Get() (string, error) {
 	req, err := http.NewRequest("GET", moneyEndpoint, nil)
 	if err != nil {
 		return "", fmt.Errorf("failed to create money request: %w", err)
