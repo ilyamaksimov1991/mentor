@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"my/bots/my_gmb/view"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 const (
@@ -76,36 +76,36 @@ type WeatherResponse struct {
 	Cod      int    `json:"cod"`
 }
 
-type Weather struct {
+type Openweathermap struct {
 }
 
-func NewWeather() *Weather {
-	return &Weather{}
+func NewOpenweathermap() *Openweathermap {
+	return &Openweathermap{}
 }
 
-func (w *Weather) Get() (string, error) {
-	result := make([]string, 0, len(cityToCoordsMap))
-	for _, coord := range cityToCoordsMap {
-		res, err := w.weather(coord)
-		if err != nil {
-			return "", fmt.Errorf("failed to get weather: %w", err)
-		}
+//func (w *Openweathermap) Get() (string, error) {
+//	result := make([]string, 0, len(cityToCoordsMap))
+//	for _, coord := range cityToCoordsMap {
+//		res, err := w.weather(coord)
+//		if err != nil {
+//			return "", fmt.Errorf("failed to get weather: %w", err)
+//		}
+//
+//		result = append(result, res)
+//	}
+//
+//	return strings.Join(result, "\n"), nil
+//}
 
-		result = append(result, res)
-	}
-
-	return strings.Join(result, "\n"), nil
-}
-
-func (w *Weather) weather(coord coord) (string, error) {
+func (w *Openweathermap) Get(coord view.Coord) (string, error) {
 	req, err := http.NewRequest("GET", weatherEndpoint, nil)
 	if err != nil {
 		return "", fmt.Errorf("failed to create weater request: %w", err)
 	}
 
 	q := req.URL.Query()
-	q.Add("lon", strconv.FormatFloat(coord.lon, 'f', 6, 64))
-	q.Add("lat", strconv.FormatFloat(coord.lat, 'f', 6, 64))
+	q.Add("lon", strconv.FormatFloat(coord.Lon, 'f', 6, 64))
+	q.Add("lat", strconv.FormatFloat(coord.Lat, 'f', 6, 64))
 	q.Add("lang", "ru")
 	q.Add("units", "metric")
 	q.Add("appid", "6b12d713c6675eeb686d1e76c3012dd3")

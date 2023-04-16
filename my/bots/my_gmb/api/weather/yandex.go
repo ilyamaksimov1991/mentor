@@ -3,13 +3,108 @@ package weather
 import (
 	"encoding/json"
 	"fmt"
+	"my/bots/my_gmb/view"
 	"net/http"
+	"strconv"
 	"time"
 )
 
-const yandexEndpoint = "'https://api.weather.yandex.ru/v2/informers?lat=55.75396&lon=37.620393"
+//const yandexEndpoint = "https://api.weather.yandex.ru/v2/forecast?lat=56.375150&lon=37.531541&extra=true"
+const yandexEndpoint = "https://api.weather.yandex.ru/v2/forecast"
 
-//const yandexEndpoint = "'https://api.weather.yandex.ru/v2/informers?lat=55.75396&lon=37.620393' --header 'X-Yandex-API-Key: e840c646-9622-4275-8082-623fb5680d5c'"
+type ConditionId string
+
+type Condition struct {
+	Id          ConditionId
+	Icon        string
+	Description string
+}
+
+var conditionIdToConditionMap = map[ConditionId]Condition{
+	"clear": {
+		Id:          "clear",
+		Description: "ясно",
+		Icon:        "☀️",
+	},
+	"partly-cloudy": {
+		Id:          "partly-cloudy",
+		Description: "малооблачно",
+		Icon:        "🌤",
+	},
+	"cloudy": {
+		Id:          "cloudy",
+		Description: "облачно с прояснениями",
+		Icon:        "🌥",
+	},
+	"overcast": {
+		Id:          "overcast",
+		Description: "пасмурно",
+		Icon:        "☁️",
+	},
+	"partly-cloudy-and-light-rain": {
+		Id:          "partly-cloudy-and-light-rain",
+		Description: "малооблачно, небольшой дождь",
+		Icon:        "🌦",
+	},
+	"partly-cloudy-and-rain": {
+		Id:          "partly-cloudy-and-rain",
+		Description: "малооблачно, дождь",
+		Icon:        "🌦",
+	},
+	"overcast-and-rain": {
+		Id:          "overcast-and-rain",
+		Description: "значительная облачность, сильный дождь",
+	},
+	"overcast-thunderstorms-with-rain": {
+		Id:          "overcast-thunderstorms-with-rain",
+		Description: "сильный дождь с грозой",
+		Icon:        "⛈",
+	},
+	"cloudy-and-light-rain": {
+		Id:          "cloudy-and-light-rain",
+		Description: "облачно, небольшой дождь",
+		Icon:        "🌧", // ?
+	},
+	"overcast-and-light-rain": {
+		Id:          "overcast-and-light-rain",
+		Description: "значительная облачность, небольшой дождь",
+		Icon:        "🌧", // ?
+	},
+	"cloudy-and-rain": {
+		Id:          "cloudy-and-rain",
+		Description: "облачно, дождь",
+		Icon:        "🌧",
+	},
+	"overcast-and-wet-snow": {
+		Id:          "overcast-and-wet-snow",
+		Description: "дождь со снегом",
+		Icon:        "🌨",
+	},
+	"partly-cloudy-and-light-snow": {
+		Id:          "partly-cloudy-and-light-snow",
+		Description: "небольшой снег",
+	},
+	"partly-cloudy-and-snow": {
+		Id:          "partly-cloudy-and-snow",
+		Description: "малооблачно, снег",
+	},
+	"overcast-and-snow": {
+		Id:          "overcast-and-snow",
+		Description: "снегопад",
+	},
+	"cloudy-and-light-snow": {
+		Id:          "cloudy-and-light-snow",
+		Description: "облачно, небольшой снег",
+	},
+	"overcast-and-light-snow": {
+		Id:          "overcast-and-light-snow",
+		Description: "значительная облачность, небольшой снег",
+	},
+	"cloudy-and-snow": {
+		Id:          "cloudy-and-snow",
+		Description: "облачно, снег",
+	},
+}
 
 type YandexResponse struct {
 	Now   int       `json:"now"`
@@ -59,18 +154,18 @@ type YandexResponse struct {
 		Temp int `json:"temp"`
 	} `json:"yesterday"`
 	Fact struct {
-		ObsTime      int     `json:"obs_time"`
-		Uptime       int     `json:"uptime"`
-		Temp         int     `json:"temp"`
-		FeelsLike    int     `json:"feels_like"`
-		Icon         string  `json:"icon"`
-		Condition    string  `json:"condition"`
-		Cloudness    int     `json:"cloudness"`
-		PrecType     int     `json:"prec_type"`
-		PrecProb     int     `json:"prec_prob"`
-		PrecStrength int     `json:"prec_strength"`
+		ObsTime   int     `json:"obs_time"`
+		Uptime    int     `json:"uptime"`
+		Temp      int     `json:"temp"`
+		FeelsLike int     `json:"feels_like"`
+		Icon      string  `json:"icon"`
+		Condition string  `json:"condition"`
+		Cloudness float64 `json:"cloudness"`
+		PrecType  int     `json:"prec_type"`
+		PrecProb  int     `json:"prec_prob"`
+		//PrecStrength int     `json:"prec_strength"`
 		IsThunder    bool    `json:"is_thunder"`
-		WindSpeed    int     `json:"wind_speed"`
+		WindSpeed    float64 `json:"wind_speed"`
 		WindDir      string  `json:"wind_dir"`
 		PressureMm   int     `json:"pressure_mm"`
 		PressurePa   int     `json:"pressure_pa"`
@@ -106,47 +201,21 @@ type YandexResponse struct {
 				Humidity     int     `json:"humidity"`
 				SoilTemp     int     `json:"soil_temp"`
 				SoilMoisture float64 `json:"soil_moisture"`
-				PrecMm       int     `json:"prec_mm"`
-				PrecProb     int     `json:"prec_prob"`
-				PrecPeriod   int     `json:"prec_period"`
-				Cloudness    int     `json:"cloudness"`
-				PrecType     int     `json:"prec_type"`
-				PrecStrength int     `json:"prec_strength"`
-				Icon         string  `json:"icon"`
-				Condition    string  `json:"condition"`
-				UvIndex      int     `json:"uv_index"`
-				FeelsLike    int     `json:"feels_like"`
-				Daytime      string  `json:"daytime"`
-				Polar        bool    `json:"polar"`
-				FreshSnowMm  int     `json:"fresh_snow_mm"`
+				//PrecMm       int     `json:"prec_mm"`
+				PrecProb   int     `json:"prec_prob"`
+				PrecPeriod int     `json:"prec_period"`
+				Cloudness  float64 `json:"cloudness"`
+				PrecType   int     `json:"prec_type"`
+				//PrecStrength int     `json:"prec_strength"`
+				Icon        string `json:"icon"`
+				Condition   string `json:"condition"`
+				UvIndex     int    `json:"uv_index"`
+				FeelsLike   int    `json:"feels_like"`
+				Daytime     string `json:"daytime"`
+				Polar       bool   `json:"polar"`
+				FreshSnowMm int    `json:"fresh_snow_mm"`
 			} `json:"night_short"`
-			Night struct {
-				Source       string  `json:"_source"`
-				TempMin      int     `json:"temp_min"`
-				TempAvg      int     `json:"temp_avg"`
-				TempMax      int     `json:"temp_max"`
-				WindSpeed    float64 `json:"wind_speed"`
-				WindGust     float64 `json:"wind_gust"`
-				WindDir      string  `json:"wind_dir"`
-				PressureMm   int     `json:"pressure_mm"`
-				PressurePa   int     `json:"pressure_pa"`
-				Humidity     int     `json:"humidity"`
-				SoilTemp     int     `json:"soil_temp"`
-				SoilMoisture float64 `json:"soil_moisture"`
-				PrecMm       int     `json:"prec_mm"`
-				PrecProb     int     `json:"prec_prob"`
-				PrecPeriod   int     `json:"prec_period"`
-				Cloudness    int     `json:"cloudness"`
-				PrecType     int     `json:"prec_type"`
-				PrecStrength int     `json:"prec_strength"`
-				Icon         string  `json:"icon"`
-				Condition    string  `json:"condition"`
-				UvIndex      int     `json:"uv_index"`
-				FeelsLike    int     `json:"feels_like"`
-				Daytime      string  `json:"daytime"`
-				Polar        bool    `json:"polar"`
-				FreshSnowMm  int     `json:"fresh_snow_mm"`
-			} `json:"night"`
+			Night    Part `json:"night"`
 			DayShort struct {
 				Source       string  `json:"_source"`
 				Temp         int     `json:"temp"`
@@ -159,112 +228,34 @@ type YandexResponse struct {
 				Humidity     int     `json:"humidity"`
 				SoilTemp     int     `json:"soil_temp"`
 				SoilMoisture float64 `json:"soil_moisture"`
-				PrecMm       int     `json:"prec_mm"`
-				PrecProb     int     `json:"prec_prob"`
-				PrecPeriod   int     `json:"prec_period"`
-				Cloudness    int     `json:"cloudness"`
-				PrecType     int     `json:"prec_type"`
-				PrecStrength int     `json:"prec_strength"`
-				Icon         string  `json:"icon"`
-				Condition    string  `json:"condition"`
-				UvIndex      int     `json:"uv_index"`
-				FeelsLike    int     `json:"feels_like"`
-				Daytime      string  `json:"daytime"`
-				Polar        bool    `json:"polar"`
-				FreshSnowMm  int     `json:"fresh_snow_mm"`
+				//PrecMm       int     `json:"prec_mm"`
+				PrecProb   int     `json:"prec_prob"`
+				PrecPeriod int     `json:"prec_period"`
+				Cloudness  float64 `json:"cloudness"`
+				PrecType   int     `json:"prec_type"`
+				//PrecStrength int     `json:"prec_strength"`
+				Icon        string `json:"icon"`
+				Condition   string `json:"condition"`
+				UvIndex     int    `json:"uv_index"`
+				FeelsLike   int    `json:"feels_like"`
+				Daytime     string `json:"daytime"`
+				Polar       bool   `json:"polar"`
+				FreshSnowMm int    `json:"fresh_snow_mm"`
 			} `json:"day_short"`
-			Day struct {
-				Source       string  `json:"_source"`
-				TempMin      int     `json:"temp_min"`
-				TempAvg      int     `json:"temp_avg"`
-				TempMax      int     `json:"temp_max"`
-				WindSpeed    float64 `json:"wind_speed"`
-				WindGust     float64 `json:"wind_gust"`
-				WindDir      string  `json:"wind_dir"`
-				PressureMm   int     `json:"pressure_mm"`
-				PressurePa   int     `json:"pressure_pa"`
-				Humidity     int     `json:"humidity"`
-				SoilTemp     int     `json:"soil_temp"`
-				SoilMoisture float64 `json:"soil_moisture"`
-				PrecMm       int     `json:"prec_mm"`
-				PrecProb     int     `json:"prec_prob"`
-				PrecPeriod   int     `json:"prec_period"`
-				Cloudness    int     `json:"cloudness"`
-				PrecType     int     `json:"prec_type"`
-				PrecStrength int     `json:"prec_strength"`
-				Icon         string  `json:"icon"`
-				Condition    string  `json:"condition"`
-				UvIndex      int     `json:"uv_index"`
-				FeelsLike    int     `json:"feels_like"`
-				Daytime      string  `json:"daytime"`
-				Polar        bool    `json:"polar"`
-				FreshSnowMm  int     `json:"fresh_snow_mm"`
-			} `json:"day"`
-			Morning struct {
-				Source       string  `json:"_source"`
-				TempMin      int     `json:"temp_min"`
-				TempAvg      int     `json:"temp_avg"`
-				TempMax      int     `json:"temp_max"`
-				WindSpeed    float64 `json:"wind_speed"`
-				WindGust     float64 `json:"wind_gust"`
-				WindDir      string  `json:"wind_dir"`
-				PressureMm   int     `json:"pressure_mm"`
-				PressurePa   int     `json:"pressure_pa"`
-				Humidity     int     `json:"humidity"`
-				SoilTemp     int     `json:"soil_temp"`
-				SoilMoisture float64 `json:"soil_moisture"`
-				PrecMm       int     `json:"prec_mm"`
-				PrecProb     int     `json:"prec_prob"`
-				PrecPeriod   int     `json:"prec_period"`
-				Cloudness    int     `json:"cloudness"`
-				PrecType     int     `json:"prec_type"`
-				PrecStrength int     `json:"prec_strength"`
-				Icon         string  `json:"icon"`
-				Condition    string  `json:"condition"`
-				UvIndex      int     `json:"uv_index"`
-				FeelsLike    int     `json:"feels_like"`
-				Daytime      string  `json:"daytime"`
-				Polar        bool    `json:"polar"`
-				FreshSnowMm  int     `json:"fresh_snow_mm"`
-			} `json:"morning"`
-			Evening struct {
-				Source       string  `json:"_source"`
-				TempMin      int     `json:"temp_min"`
-				TempAvg      int     `json:"temp_avg"`
-				TempMax      int     `json:"temp_max"`
-				WindSpeed    int     `json:"wind_speed"`
-				WindGust     float64 `json:"wind_gust"`
-				WindDir      string  `json:"wind_dir"`
-				PressureMm   int     `json:"pressure_mm"`
-				PressurePa   int     `json:"pressure_pa"`
-				Humidity     int     `json:"humidity"`
-				SoilTemp     int     `json:"soil_temp"`
-				SoilMoisture float64 `json:"soil_moisture"`
-				PrecMm       int     `json:"prec_mm"`
-				PrecProb     int     `json:"prec_prob"`
-				PrecPeriod   int     `json:"prec_period"`
-				Cloudness    int     `json:"cloudness"`
-				PrecType     int     `json:"prec_type"`
-				PrecStrength int     `json:"prec_strength"`
-				Icon         string  `json:"icon"`
-				Condition    string  `json:"condition"`
-				UvIndex      int     `json:"uv_index"`
-				FeelsLike    int     `json:"feels_like"`
-				Daytime      string  `json:"daytime"`
-				Polar        bool    `json:"polar"`
-				FreshSnowMm  int     `json:"fresh_snow_mm"`
-			} `json:"evening"`
+			Day     Part `json:"day"`
+			Morning Part `json:"morning"`
+			Evening Part `json:"evening"`
 		} `json:"parts"`
 		Hours []struct {
-			Hour         string  `json:"hour"`
-			HourTs       int     `json:"hour_ts"`
-			Temp         int     `json:"temp"`
-			FeelsLike    int     `json:"feels_like"`
-			Icon         string  `json:"icon"`
-			Condition    string  `json:"condition"`
-			Cloudness    int     `json:"cloudness"`
-			PrecType     int     `json:"prec_type"`
-			PrecStrength int     `json:"prec_strength"`
+			Hour      string  `json:"hour"`
+			HourTs    int     `json:"hour_ts"`
+			Temp      int     `json:"temp"`
+			FeelsLike int     `json:"feels_like"`
+			Icon      string  `json:"icon"`
+			Condition string  `json:"condition"`
+			Cloudness float64 `json:"cloudness"`
+			PrecType  int     `json:"prec_type"`
+			//PrecStrength int     `json:"prec_strength"`
 			IsThunder    bool    `json:"is_thunder"`
 			WindDir      string  `json:"wind_dir"`
 			WindSpeed    float64 `json:"wind_speed"`
@@ -275,15 +266,43 @@ type YandexResponse struct {
 			UvIndex      int     `json:"uv_index"`
 			SoilTemp     int     `json:"soil_temp"`
 			SoilMoisture float64 `json:"soil_moisture"`
-			PrecMm       int     `json:"prec_mm"`
-			PrecPeriod   int     `json:"prec_period"`
-			PrecProb     int     `json:"prec_prob"`
+			//PrecMm       int     `json:"prec_mm"`
+			PrecPeriod int `json:"prec_period"`
+			PrecProb   int `json:"prec_prob"`
 		} `json:"hours"`
 		Biomet struct {
 			Index     int    `json:"index"`
 			Condition string `json:"condition"`
 		} `json:"biomet,omitempty"`
 	} `json:"forecasts"`
+}
+
+type Part struct {
+	Source       string  `json:"_source"`
+	TempMin      int     `json:"temp_min"`
+	TempAvg      int     `json:"temp_avg"`
+	TempMax      int     `json:"temp_max"`
+	WindSpeed    float64 `json:"wind_speed"`
+	WindGust     float64 `json:"wind_gust"`
+	WindDir      string  `json:"wind_dir"`
+	PressureMm   int     `json:"pressure_mm"`
+	PressurePa   int     `json:"pressure_pa"`
+	Humidity     int     `json:"humidity"`
+	SoilTemp     int     `json:"soil_temp"`
+	SoilMoisture float64 `json:"soil_moisture"`
+	//PrecMm       int         `json:"prec_mm"`
+	PrecProb   int     `json:"prec_prob"`
+	PrecPeriod int     `json:"prec_period"`
+	Cloudness  float64 `json:"cloudness"`
+	PrecType   int     `json:"prec_type"`
+	//PrecStrength int         `json:"prec_strength"`
+	Icon        string      `json:"icon"`
+	Condition   ConditionId `json:"condition"`
+	UvIndex     int         `json:"uv_index"`
+	FeelsLike   int         `json:"feels_like"`
+	Daytime     string      `json:"daytime"`
+	Polar       bool        `json:"polar"`
+	FreshSnowMm int         `json:"fresh_snow_mm"`
 }
 
 type Yandex struct {
@@ -293,30 +312,75 @@ func NewYandex() *Yandex {
 	return &Yandex{}
 }
 
-func (w *Yandex) Get() (string, error) {
-	return fmt.Sprint(" Утро: +9☁️ День:+11🌨 Ночь +12☀️\n"), nil
-}
-func (w *Yandex) Get2() (string, error) {
-	client := &http.Client{}
+func (w *Yandex) Get(coord view.Coord) (string, error) {
 	req, err := http.NewRequest("GET", yandexEndpoint, nil)
-	req.Header.Set("X-Yandex-API-Key", "e840c646-9622-4275-8082-623fb5680d5c")
-
 	if err != nil {
-		fmt.Println(err)
+		return "", fmt.Errorf("failed to create new get request: %w", err)
 	}
+	req.Header.Set("X-Yandex-API-Key", "65f7557b-17ce-4fce-9ec2-c0f5b829a1b9")
+
+	q := req.URL.Query()
+	q.Add("lon", strconv.FormatFloat(coord.Lon, 'f', 6, 64))
+	q.Add("lat", strconv.FormatFloat(coord.Lat, 'f', 6, 64))
+	q.Add("extra", "true")
+	req.URL.RawQuery = q.Encode()
+
+	client := &http.Client{}
 	res, err := client.Do(req)
-	if res.Body != nil {
-		defer res.Body.Close()
+	if err != nil {
+		return "", fmt.Errorf("get request failed: %w", err)
+	}
+	defer res.Body.Close()
+
+	weather := &YandexResponse{}
+	err = json.NewDecoder(res.Body).Decode(weather)
+	if err != nil {
+		return "", fmt.Errorf("yandex weather decoding error: %w", err)
 	}
 
-	curs := &YandexResponse{}
-	derr := json.NewDecoder(res.Body).Decode(curs)
-	if derr != nil {
-		return "", fmt.Errorf("crypto decoding error: %w", err)
-	}
-	//
-	//return fmt.Sprintf(" USD %.2f \n EUR %.2f \n UZS %.2f \n",
-	//	curs.Quotes.Usdrub, curs.Quotes.Usdrub/curs.Quotes.Usdeur, curs.Quotes.Usduzs), nil
+	day := 0
+	tempMinMorning := weather.Forecasts[day].Parts.Morning.TempMin
+	tempMinDay := weather.Forecasts[day].Parts.Day.TempMin
+	tempMinEvening := weather.Forecasts[day].Parts.Evening.TempMin
+	tempMinNight := weather.Forecasts[day+1].Parts.Night.TempMin
 
-	return "", nil
+	tempMaxMorning := weather.Forecasts[day].Parts.Morning.TempMax
+	tempMaxDay := weather.Forecasts[day].Parts.Day.TempMax
+	tempMaxEvening := weather.Forecasts[day].Parts.Evening.TempMax
+	tempMaxNight := weather.Forecasts[day+1].Parts.Night.TempMax
+
+	iconMorning := conditionIdToConditionMap[weather.Forecasts[day].Parts.Morning.Condition].Icon
+	iconDay := conditionIdToConditionMap[weather.Forecasts[day].Parts.Day.Condition].Icon
+	iconEvening := conditionIdToConditionMap[weather.Forecasts[day].Parts.Evening.Condition].Icon
+	iconNight := conditionIdToConditionMap[weather.Forecasts[day+1].Parts.Night.Condition].Icon
+
+	conditionMorning := conditionIdToConditionMap[weather.Forecasts[day].Parts.Morning.Condition]
+	conditionDay := conditionIdToConditionMap[weather.Forecasts[day].Parts.Day.Condition]
+	conditionEvening := conditionIdToConditionMap[weather.Forecasts[day].Parts.Evening.Condition]
+	conditionNight := conditionIdToConditionMap[weather.Forecasts[day+1].Parts.Night.Condition]
+
+	return fmt.Sprintf(
+		"[%s](%s): \n"+
+			"Утро: %s %s (%s); \n"+
+			"День: %s %s (%s); \n"+
+			"Вечер: %s %s (%s); \n"+
+			"Ночь: %s %s (%s);",
+		weather.GeoObject.Locality.Name, weather.Info.URL,
+		addRange(tempMinMorning, tempMaxMorning), iconMorning, conditionMorning.Description, //humidityMorning,
+		addRange(tempMinDay, tempMaxDay), iconDay, conditionDay.Description, //humidityDay,
+		addRange(tempMinEvening, tempMaxEvening), iconEvening, conditionEvening.Description, //humidityEvening,
+		addRange(tempMinNight, tempMaxNight), iconNight, conditionNight.Description, //humidityNight,
+	), nil
+}
+
+func addRange(from int, to int) string {
+	var signFrom string
+	var signTo string
+	if from > 0 {
+		signFrom = "+"
+	}
+	if to > 0 {
+		signTo = "+"
+	}
+	return fmt.Sprintf("%s%d°...%s%d°", signFrom, from, signTo, to)
 }

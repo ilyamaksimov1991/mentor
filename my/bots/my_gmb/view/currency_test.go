@@ -6,7 +6,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/zap"
-	mock_view "my/bots/my_gmb/view/mock"
+	mock "my/bots/my_gmb/view/mock"
 	"testing"
 	"time"
 )
@@ -21,9 +21,9 @@ type CurrencyView struct {
 	ctrl *gomock.Controller
 	ctx  context.Context
 
-	cbr                 *mock_view.MockCurrencier
-	crypto              *mock_view.MockCurrencier
-	currency            *mock_view.MockCurrencier
+	cbr                 *mock.MockCurrencier
+	crypto              *mock.MockCurrencier
+	currency            *mock.MockCurrencier
 	maxCountRetries     int
 	timeoutBetweenRetry time.Duration
 	logger              *zap.Logger
@@ -34,9 +34,9 @@ func (v *CurrencyView) SetupTest() {
 	v.ctrl = gomock.NewController(v.T())
 	v.ctx = context.Background()
 
-	v.cbr = mock_view.NewMockCurrencier(v.ctrl)
-	v.currency = mock_view.NewMockCurrencier(v.ctrl)
-	v.crypto = mock_view.NewMockCurrencier(v.ctrl)
+	v.cbr = mock.NewMockCurrencier(v.ctrl)
+	v.currency = mock.NewMockCurrencier(v.ctrl)
+	v.crypto = mock.NewMockCurrencier(v.ctrl)
 
 	v.maxCountRetries = 2
 	v.timeoutBetweenRetry = time.Millisecond * 100
@@ -92,7 +92,7 @@ func (v *CurrencyView) TestError() {
 		v.crypto.EXPECT().Get().Return("", errors.New("error")).Times(v.maxCountRetries)
 
 		res, err := v.view.View()
-		v.Error(err, "failed to get exchange rate data")
+		v.EqualError(err, "failed to get exchange rate data")
 		v.Equal("", res)
 	})
 }
