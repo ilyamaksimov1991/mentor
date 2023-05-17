@@ -10,28 +10,10 @@ import (
 )
 
 const (
-	weatherEndpoint = "https://api.openweathermap.org/data/2.5/weather/"
+	openweathermapEndpoint = "https://api.openweathermap.org/data/2.5/weather/"
 )
 
-type city int
-type coord struct {
-	lon float64
-	lat float64
-}
-
-const (
-	ufa      city = 1
-	dmitrov  city = 2
-	tashkent city = 3
-)
-
-var cityToCoordsMap = map[city]coord{
-	ufa:      {lat: 54.809469, lon: 56.113848}, // долгота longitude
-	dmitrov:  {lat: 56.375150, lon: 37.531541}, // широта latitude
-	tashkent: {lat: 41.264650, lon: 69.216270},
-}
-
-type WeatherResponse struct {
+type OWMResponse struct {
 	Coord struct {
 		Lon float64 `json:"lon"`
 		Lat float64 `json:"lat"`
@@ -98,7 +80,7 @@ func NewOpenweathermap() *Openweathermap {
 //}
 
 func (w *Openweathermap) Get(coord view.Coord) (string, error) {
-	req, err := http.NewRequest("GET", weatherEndpoint, nil)
+	req, err := http.NewRequest("GET", openweathermapEndpoint, nil)
 	if err != nil {
 		return "", fmt.Errorf("failed to create weater request: %w", err)
 	}
@@ -117,7 +99,7 @@ func (w *Openweathermap) Get(coord view.Coord) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	weather := &WeatherResponse{}
+	weather := &OWMResponse{}
 	derr := json.NewDecoder(resp.Body).Decode(weather)
 	if derr != nil {
 		return "", fmt.Errorf("weather decoding error: %w", err)

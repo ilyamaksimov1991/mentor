@@ -54,7 +54,7 @@ func (w *Weather) View() (string, error) {
 	for _, coord := range cityToCoordsMap {
 		yandexWeather, err := w.yandex.Get(coord)
 		if err != nil {
-			w.logger.Error("", zap.Error(err))
+			w.logger.Error("error getting data from yandex", zap.Error(err))
 			continue
 		}
 		result = append(result, yandexWeather)
@@ -64,7 +64,7 @@ func (w *Weather) View() (string, error) {
 		for _, coord := range cityToCoordsMap {
 			owmWeather, err := w.openweathermap.Get(coord)
 			if err != nil {
-				w.logger.Error("", zap.Error(err))
+				w.logger.Error("error getting data from openweathermap", zap.Error(err))
 				continue
 			}
 			result = append(result, owmWeather)

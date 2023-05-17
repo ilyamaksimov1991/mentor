@@ -53,14 +53,6 @@ func main() {
 		logger.Fatal("tg sender creation error", zap.Error(err))
 	}
 
-	//template := "![alt text](https://yastatic.net/weather/i/icons/funky/dark/bkn_d.svg)"
-
-	//ya := weather.NewYandex()
-	//res, err := ya.Get()
-	//if err != nil {
-	//	logger.Fatal("err", zap.Error(err))
-	//}
-
 	//ya := view.NewWeather(weather.NewYandex(), weather.NewOpenweathermap(), logger)
 	//res, err := ya.Get()
 	//if err != nil {
@@ -74,19 +66,6 @@ func main() {
 	//
 	//return
 
-	//viewer := view.ViewGoodmorning(
-	//	holiday.NewHolidaysToday(),
-	//	advice.NewAdvice(),
-	//	quote.NewQuoter(),
-	//	fact.NewFact(),
-	//	money.NewCbr(),
-	//	money.NewCurrency(),
-	//	money.NewCrypto(),
-	//	weather.NewWeather(),
-	//	api.NewHoroscope(),
-	//	cfg.Retry,
-	//	logger,
-	//)
 	viewer := view.ViewGoodmorning(
 		holiday.NewHolidaysToday(),
 		advice.NewAdvice(),

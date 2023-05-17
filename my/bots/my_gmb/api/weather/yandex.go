@@ -2,6 +2,7 @@ package weather
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"my/bots/my_gmb/view"
 	"net/http"
@@ -20,6 +21,28 @@ type Condition struct {
 	Description string
 }
 
+/*
+TODO поправить/добавить
+clear — ясно.
+partly-cloudy — малооблачно.
+cloudy — облачно с прояснениями.
+overcast — пасмурно.
+drizzle — морось.
+light-rain — небольшой дождь.
+rain — дождь.
+moderate-rain — умеренно сильный дождь.
+heavy-rain — сильный дождь.
+continuous-heavy-rain — длительный сильный дождь.
+showers — ливень.
+wet-snow — дождь со снегом.
+light-snow — небольшой снег.
+snow — снег.
+snow-showers — снегопад.
+hail — град.
+thunderstorm — гроза.
+thunderstorm-with-rain — дождь с грозой.
+thunderstorm-with-hail — гроза с градом.
+*/
 var conditionIdToConditionMap = map[ConditionId]Condition{
 	"clear": {
 		Id:          "clear",
@@ -44,6 +67,11 @@ var conditionIdToConditionMap = map[ConditionId]Condition{
 	"partly-cloudy-and-light-rain": {
 		Id:          "partly-cloudy-and-light-rain",
 		Description: "малооблачно, небольшой дождь",
+		Icon:        "🌦",
+	},
+	"light-rain": {
+		Id:          "light-rain",
+		Description: "небольшой дождь",
 		Icon:        "🌦",
 	},
 	"partly-cloudy-and-rain": {
@@ -73,6 +101,11 @@ var conditionIdToConditionMap = map[ConditionId]Condition{
 	"cloudy-and-rain": {
 		Id:          "cloudy-and-rain",
 		Description: "облачно, дождь",
+		Icon:        "🌧",
+	},
+	"rain": {
+		Id:          "rain",
+		Description: "дождь",
 		Icon:        "🌧",
 	},
 	"overcast-and-wet-snow": {
@@ -317,11 +350,12 @@ func (w *Yandex) Get(coord view.Coord) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to create new get request: %w", err)
 	}
-	req.Header.Set("X-Yandex-API-Key", "65f7557b-17ce-4fce-9ec2-c0f5b829a1b9")
+	req.Header.Set("X-Yandex-API-Key", "de011669-83cc-425b-b32f-e467e0cdd46b")
 
 	q := req.URL.Query()
 	q.Add("lon", strconv.FormatFloat(coord.Lon, 'f', 6, 64))
 	q.Add("lat", strconv.FormatFloat(coord.Lat, 'f', 6, 64))
+	//q.Add("limit", "3")
 	q.Add("extra", "true")
 	req.URL.RawQuery = q.Encode()
 
@@ -338,6 +372,9 @@ func (w *Yandex) Get(coord view.Coord) (string, error) {
 		return "", fmt.Errorf("yandex weather decoding error: %w", err)
 	}
 
+	if len(weather.Forecasts) == 0 {
+		return "", errors.New("missing forecast")
+	}
 	day := 0
 	tempMinMorning := weather.Forecasts[day].Parts.Morning.TempMin
 	tempMinDay := weather.Forecasts[day].Parts.Day.TempMin
@@ -361,10 +398,10 @@ func (w *Yandex) Get(coord view.Coord) (string, error) {
 
 	return fmt.Sprintf(
 		"[%s](%s): \n"+
-			"Утро: %s %s (%s); \n"+
-			"День: %s %s (%s); \n"+
-			"Вечер: %s %s (%s); \n"+
-			"Ночь: %s %s (%s);",
+			"_Утро_: %s %s (%s); \n"+
+			"_День_: %s %s (%s); \n"+
+			"_Вечер_: %s %s (%s); \n"+
+			"_Ночь_: %s %s (%s);",
 		weather.GeoObject.Locality.Name, weather.Info.URL,
 		addRange(tempMinMorning, tempMaxMorning), iconMorning, conditionMorning.Description, //humidityMorning,
 		addRange(tempMinDay, tempMaxDay), iconDay, conditionDay.Description, //humidityDay,

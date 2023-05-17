@@ -126,7 +126,7 @@ func (g *Goodmorning) weatherOfCities() (string, error) {
 		return "", fmt.Errorf("weather getting error: %w", err)
 	}
 
-	return fmt.Sprintf("\n%s", res), nil
+	return fmt.Sprintf("%s", res), nil
 	//return fmt.Sprintf("*Погода:* \n%s", res), nil
 }
 
